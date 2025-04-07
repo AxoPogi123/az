@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Galaxy</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      height: 100%;
+      background: black;
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: block;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="galaxy"></canvas>
+
+  <script>
+    const canvas = document.getElementById("galaxy");
+    const ctx = canvas.getContext("2d");
+    let stars = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    function createStars(count) {
+      stars = [];
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          z: Math.random() * canvas.width,
+        });
+      }
+    }
+
+    function drawStars() {
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "white";
+      for (let star of stars) {
+        const k = 128.0 / star.z;
+        const x = (star.x - canvas.width / 2) * k + canvas.width / 2;
+        const y = (star.y - canvas.height / 2) * k + canvas.height / 2;
+        const size = (1 - star.z / canvas.width) * 2;
+
+        if (x >= 0 && x <= canvas.width && y >= 0 && y <= canvas.height) {
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    function moveStars(speed) {
+      for (let star of stars) {
+        star.z -= speed;
+        if (star.z <= 0) {
+          star.z = canvas.width;
+          star.x = Math.random() * canvas.width;
+          star.y = Math.random() * canvas.height;
+        }
+      }
+    }
+
+    function animate() {
+      moveStars(2);
+      drawStars();
+      requestAnimationFrame(animate);
+    }
+
+    createStars(500);
+    animate();
+  </script>
+</body>
+</html>
